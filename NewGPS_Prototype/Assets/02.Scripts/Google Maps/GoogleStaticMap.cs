@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class GoogleStaticMap : MonoBehaviour
 {
-    public static GoogleStaticMap Instance { set; get; }
 	public RawImage rawImage;
 	[Range(0f, 1f)]
 	public float transparency = 1f;
@@ -15,7 +14,7 @@ public class GoogleStaticMap : MonoBehaviour
 	[Range(1, 20)]
 	public int mapZoom = 15;
 	public int mapWidth = 1440;
-	public int mapHeight = 2960;
+	public int mapHeight = 1440;
 	public enum MapType
 	{
 		roadmap, satellite, terrain, hybrid,
@@ -43,9 +42,11 @@ public class GoogleStaticMap : MonoBehaviour
 
     public Text coordinates;
 
+    double detailed_num = 1.0;
+
 	IEnumerator Map()
 	{
-        coordinates.text = "Lat : " + mapCenterLatitude + "\nLon : " + mapCenterLongtitude + "\nMap is Updated!";
+        coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num + "\nMap is Updated!";
         rawImageColor.a = transparency;
 		rawImage.color = rawImageColor;
         markerLatitude = mapCenterLatitude;
@@ -64,9 +65,9 @@ public class GoogleStaticMap : MonoBehaviour
 		WWW www = new WWW(url);
 		yield return www;
 		rawImage.texture = www.texture;
-		rawImage.SetNativeSize();
+		//rawImage.SetNativeSize();
 
-        coordinates.text = "Lat : " + mapCenterLatitude + "\nLon : " + mapCenterLongtitude;
+        coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num;
 
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(Map());
@@ -89,7 +90,6 @@ public class GoogleStaticMap : MonoBehaviour
 
 	private void Start()
 	{
-        Instance = this;
 		Reset();
         StartCoroutine(StartLocationService());
     }
@@ -103,41 +103,45 @@ public class GoogleStaticMap : MonoBehaviour
 
     private IEnumerator StartLocationService()
     {
-        if (!Input.location.isEnabledByUser)
-        {
-            Debug.Log("User has not enabled GPS");
-            yield return new WaitForSeconds(1f);
-        }
+        
+            if (!Input.location.isEnabledByUser)
+            {
+                Debug.Log("User has not enabled GPS");
+                yield return new WaitForSeconds(1f);
+            }
 
-        Input.location.Start();
-        int maxWait = 20;
-        while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-        {
-            yield return new WaitForSeconds(1f);
-            maxWait--;
-        }
+            Input.location.Start();
+            int maxWait = 20;
+        
+            while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+            {
+                yield return new WaitForSeconds(1f);
+                maxWait--;
+            }
 
-        if (maxWait <= 0)
-        {
-            Debug.Log("Timed out");
-        }
+            if (maxWait <= 0)
+            {
+                Debug.Log("Timed out");
+            }
 
-        if (Input.location.status == LocationServiceStatus.Failed)
-        {
-            Debug.Log("Unable to determine device location");
-            yield break;
-        }
-        else
-        {
-            mapCenterLatitude = Input.location.lastData.latitude;
-            mapCenterLongtitude = Input.location.lastData.longitude;
-        }
+            if (Input.location.status == LocationServiceStatus.Failed)
+            {
+                Debug.Log("Unable to determine device location");
+                yield break;
+            }
+                mapCenterLatitude = Input.location.lastData.latitude;
+                mapCenterLongtitude = Input.location.lastData.longitude;
+                coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
+                    + "\nGPS is updated!";
 
-        while (Input.location.isEnabledByUser)
-        {
-            yield return new WaitForSeconds(1f);
-        }
-
+        /*
+            while (Input.location.isEnabledByUser)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+            */
+        yield return new WaitForSeconds(1f);
         yield return StartCoroutine(StartLocationService());
+        
     }
 }
