@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: Assets/01.Scenes/Google Maps Example/User1.unity
+    guid: 5e7cc6b79702b2d4baa287e09cabbf9e
+  - enabled: 1
+    path: Assets/01.Scenes/Google Maps Example/User2.unity
+    guid: 000f705b7a0efa447842ca25ff6d236d
   m_configObjects: {}

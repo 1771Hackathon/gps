@@ -52,9 +52,28 @@ public class GoogleStaticMap : MonoBehaviour
 	private string url;
 	private Color rawImageColor = Color.white;
 
-    //public Text coordinates;
+    public Text coordinates;
 
     double detailed_num = 1.0;
+
+    double distance;
+
+    private double Harversine(float lat1, float lat2, float lon1, float lon2)
+    {
+        float R = 6371000; // metres
+        float omega1 = ((lat1 / 180) * Mathf.PI);
+        float omega2 = ((lat2 / 180) * Mathf.PI);
+        float variacionomega1 = (((lat2 - lat1) / 180) * Mathf.PI);
+        float variacionomega2 = (((lon2 - lon1) / 180) * Mathf.PI);
+        float a = Mathf.Sin(variacionomega1 / 2) * Mathf.Sin(variacionomega1 / 2) +
+                    Mathf.Cos(omega1) * Mathf.Cos(omega2) *
+                    Mathf.Sin(variacionomega2 / 2) * Mathf.Sin(variacionomega2 / 2);
+        float c = 2 * Mathf.Asin(Mathf.Sqrt(a));
+
+        float d = R * c;
+
+        return d;
+    }
 
 	IEnumerator Map()
 	{
@@ -74,14 +93,15 @@ public class GoogleStaticMap : MonoBehaviour
 			+ "&maptype=" + mapType
 			+ "&markers=size:" + markerSize + "%7Ccolor:" + teacherMarkerColor + "%7Clabel:" + "T" + "%7C" + teacherMarkerLatitude + "," + teacherMarkerLongtitude
             + "&markers=size:" + markerSize + "%7Ccolor:" + child1MarkerColor + "%7Clabel:" + label + "%7C" + child1MarkerLatitude + "," + child1MarkerLongtitude
-            + "&markers=size:" + markerSize + "%7Ccolor:" + child2MarkerColor + "%7Clabel:" + label + "%7C" + child2MarkerLatitude + "," + child2MarkerLongtitude
+            //+ "&markers=size:" + markerSize + "%7Ccolor:" + child2MarkerColor + "%7Clabel:" + label + "%7C" + child2MarkerLatitude + "," + child2MarkerLongtitude
             + "&key=" + apiKey;
 		WWW www = new WWW(url);
 		yield return www;
 		rawImage.texture = www.texture;
 		//rawImage.SetNativeSize();
 
-        //coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num;
+        coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
+            + "\nDistance(T-C1) : " + distance.ToString() + "m";
 
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(Map());
@@ -106,7 +126,7 @@ public class GoogleStaticMap : MonoBehaviour
 	{
 		Reset();
         StartCoroutine(StartLocationService());
-        StartCoroutine(ChildCoordinateChange());
+        //StartCoroutine(ChildCoordinateChange());
     }
 
 #if UNITY_EDITOR
@@ -146,7 +166,9 @@ public class GoogleStaticMap : MonoBehaviour
             }
                 mapCenterLatitude = Input.location.lastData.latitude;
                 mapCenterLongtitude = Input.location.lastData.longitude;
-                /*coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
+        distance = Harversine(teacherMarkerLatitude, child1MarkerLatitude, teacherMarkerLongtitude, child1MarkerLongtitude);
+        distance = Math.Round(distance);
+        /*coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
                     + "\nGPS is updated!";*/
 
         /*
@@ -159,23 +181,21 @@ public class GoogleStaticMap : MonoBehaviour
         yield return StartCoroutine(StartLocationService());
         
     }
-
+    /*
     IEnumerator ChildCoordinateChange()
     {
         child1MarkerLatitude = 37.3007888f;
         child1MarkerLongtitude = 126.8379592f;
-        child2MarkerLatitude = 37.2958946f;
-        child2MarkerLongtitude = 126.8414688f;
+        
 
         yield return new WaitForSeconds(3f);
 
         child1MarkerLatitude = 37.2958946f;
         child1MarkerLongtitude = 126.8414688f;
-        child2MarkerLatitude = 37.3007888f;
-        child2MarkerLongtitude = 126.8379592f;
+        
 
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(ChildCoordinateChange());
     }
-
+    */
 }
