@@ -9,10 +9,10 @@ public class GoogleStaticMap : MonoBehaviour
 	public RawImage rawImage;
 	[Range(0f, 1f)]
 	public float transparency = 1f;
-	public float mapCenterLatitude = 37.5665350f;
-	public float mapCenterLongtitude = 126.9779690f;
+	public float mapCenterLatitude = 37.3007888f;
+	public float mapCenterLongtitude = 126.8379592f;
 	[Range(1, 20)]
-	public int mapZoom = 15;
+	public int mapZoom = 13;
 	public int mapWidth = 1440;
 	public int mapHeight = 1440;
 	public enum MapType
@@ -22,9 +22,17 @@ public class GoogleStaticMap : MonoBehaviour
 	public MapType mapType = MapType.roadmap;
 	[Range(1, 4)]
 	public int scale = 1;
-	public float markerLatitude = 37.5665350f;
-	public float markerLongtitude = 126.9779690f;
-	public enum MarkerSize
+
+	public float teacherMarkerLatitude = 37.3007888f;
+	public float teacherMarkerLongtitude = 126.8379592f;
+
+    public float child1MarkerLatitude = 37.2958946f;
+    public float child1MarkerLongtitude = 126.8414688f;
+
+    public float child2MarkerLatitude = 37.3007888f;
+    public float child2MarkerLongtitude = 126.8379592f;
+
+    public enum MarkerSize
 	{
 		tiny, mid, small,
 	}
@@ -34,23 +42,26 @@ public class GoogleStaticMap : MonoBehaviour
 		black, brown, green, purple, yellow, blue, gray, orange, red, white,
 	}
 	public MarkerColor markerColor = MarkerColor.blue;
+    public MarkerColor childMarkerColor = MarkerColor.orange;
+
 	public char label = 'C';
+
 	public string apiKey;
 
 	private string url;
 	private Color rawImageColor = Color.white;
 
-    public Text coordinates;
+    //public Text coordinates;
 
     double detailed_num = 1.0;
 
 	IEnumerator Map()
 	{
-        coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num + "\nMap is Updated!";
+        //coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num + "\nMap is Updated!";
         rawImageColor.a = transparency;
 		rawImage.color = rawImageColor;
-        markerLatitude = mapCenterLatitude;
-        markerLongtitude = mapCenterLongtitude;
+        teacherMarkerLatitude = mapCenterLatitude;
+        teacherMarkerLongtitude = mapCenterLongtitude;
 
         label = Char.ToUpper(label);
 
@@ -60,14 +71,16 @@ public class GoogleStaticMap : MonoBehaviour
 			+ "&size=" + mapWidth + "x" + mapHeight
 			+ "&scale=" + scale
 			+ "&maptype=" + mapType
-			+ "&markers=size:" + markerSize + "%7Ccolor:" + markerColor + "%7Clabel:" + label + "%7C" + markerLatitude + "," + markerLongtitude
-			+ "&key=" + apiKey;
+			+ "&markers=size:" + markerSize + "%7Ccolor:" + markerColor + "%7Clabel:" + "T" + "%7C" + teacherMarkerLatitude + "," + teacherMarkerLongtitude
+            + "&markers=size:" + markerSize + "%7Ccolor:" + childMarkerColor + "%7Clabel:" + label + "%7C" + child1MarkerLatitude + "," + child1MarkerLongtitude
+            + "&markers=size:" + markerSize + "%7Ccolor:" + childMarkerColor + "%7Clabel:" + label + "%7C" + child2MarkerLatitude + "," + child2MarkerLongtitude
+            + "&key=" + apiKey;
 		WWW www = new WWW(url);
 		yield return www;
 		rawImage.texture = www.texture;
 		//rawImage.SetNativeSize();
 
-        coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num;
+        //coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num;
 
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(Map());
@@ -100,7 +113,7 @@ public class GoogleStaticMap : MonoBehaviour
 		RefreshMap();
 	}
 #endif
-
+    
     private IEnumerator StartLocationService()
     {
         
@@ -131,8 +144,8 @@ public class GoogleStaticMap : MonoBehaviour
             }
                 mapCenterLatitude = Input.location.lastData.latitude;
                 mapCenterLongtitude = Input.location.lastData.longitude;
-                coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
-                    + "\nGPS is updated!";
+                /*coordinates.text = "Lat : " + mapCenterLatitude * detailed_num + "\nLon : " + mapCenterLongtitude * detailed_num
+                    + "\nGPS is updated!";*/
 
         /*
             while (Input.location.isEnabledByUser)
@@ -144,4 +157,5 @@ public class GoogleStaticMap : MonoBehaviour
         yield return StartCoroutine(StartLocationService());
         
     }
+
 }
