@@ -41,8 +41,9 @@ public class GoogleStaticMap : MonoBehaviour
 	{
 		black, brown, green, purple, yellow, blue, gray, orange, red, white,
 	}
-	public MarkerColor markerColor = MarkerColor.blue;
-    public MarkerColor childMarkerColor = MarkerColor.orange;
+	public MarkerColor teacherMarkerColor = MarkerColor.blue;
+    public MarkerColor child1MarkerColor = MarkerColor.orange;
+    public MarkerColor child2MarkerColor = MarkerColor.green;
 
 	public char label = 'C';
 
@@ -71,9 +72,9 @@ public class GoogleStaticMap : MonoBehaviour
 			+ "&size=" + mapWidth + "x" + mapHeight
 			+ "&scale=" + scale
 			+ "&maptype=" + mapType
-			+ "&markers=size:" + markerSize + "%7Ccolor:" + markerColor + "%7Clabel:" + "T" + "%7C" + teacherMarkerLatitude + "," + teacherMarkerLongtitude
-            + "&markers=size:" + markerSize + "%7Ccolor:" + childMarkerColor + "%7Clabel:" + label + "%7C" + child1MarkerLatitude + "," + child1MarkerLongtitude
-            + "&markers=size:" + markerSize + "%7Ccolor:" + childMarkerColor + "%7Clabel:" + label + "%7C" + child2MarkerLatitude + "," + child2MarkerLongtitude
+			+ "&markers=size:" + markerSize + "%7Ccolor:" + teacherMarkerColor + "%7Clabel:" + "T" + "%7C" + teacherMarkerLatitude + "," + teacherMarkerLongtitude
+            + "&markers=size:" + markerSize + "%7Ccolor:" + child1MarkerColor + "%7Clabel:" + label + "%7C" + child1MarkerLatitude + "," + child1MarkerLongtitude
+            + "&markers=size:" + markerSize + "%7Ccolor:" + child2MarkerColor + "%7Clabel:" + label + "%7C" + child2MarkerLatitude + "," + child2MarkerLongtitude
             + "&key=" + apiKey;
 		WWW www = new WWW(url);
 		yield return www;
@@ -105,6 +106,7 @@ public class GoogleStaticMap : MonoBehaviour
 	{
 		Reset();
         StartCoroutine(StartLocationService());
+        StartCoroutine(ChildCoordinateChange());
     }
 
 #if UNITY_EDITOR
@@ -156,6 +158,24 @@ public class GoogleStaticMap : MonoBehaviour
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(StartLocationService());
         
+    }
+
+    IEnumerator ChildCoordinateChange()
+    {
+        child1MarkerLatitude = 37.3007888f;
+        child1MarkerLongtitude = 126.8379592f;
+        child2MarkerLatitude = 37.2958946f;
+        child2MarkerLongtitude = 126.8414688f;
+
+        yield return new WaitForSeconds(3f);
+
+        child1MarkerLatitude = 37.2958946f;
+        child1MarkerLongtitude = 126.8414688f;
+        child2MarkerLatitude = 37.3007888f;
+        child2MarkerLongtitude = 126.8379592f;
+
+        yield return new WaitForSeconds(3f);
+        yield return StartCoroutine(ChildCoordinateChange());
     }
 
 }
